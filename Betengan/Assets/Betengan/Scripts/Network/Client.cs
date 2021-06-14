@@ -279,6 +279,7 @@ public class Client : MonoBehaviour
             { (int)ServerPackets.login, ClientHandle.Login },
             { (int)ServerPackets.signUp, ClientHandle.SignUp },
             { (int)ServerPackets.sendIntoLobby, ClientHandle.SendIntoLobby },
+            { (int)ServerPackets.roomMaster, ClientHandle.RoomMaster },
             { (int)ServerPackets.changeTeam, ClientHandle.ChangeTeam },
             { (int)ServerPackets.startGame, ClientHandle.StartGame },
             { (int)ServerPackets.playerDisconnected, ClientHandle.PlayerDisconnected },

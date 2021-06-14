@@ -17,7 +17,7 @@ public class AuthManager : MonoBehaviour
         None,
         UsernameAlreadyExist,
         UserNotFound,
-        WrongPassword
+        WrongPassword,
     }
 
     private AuthError error;
@@ -36,8 +36,8 @@ public class AuthManager : MonoBehaviour
 
     public void LoginInput(int _clientId, string _username, string _password)
     {
-        User _user = Authenticate(_username, _password);     
-        
+        Authenticate(_username, _password);
+
         if(error != AuthError.None)
         {
             string _message = "Login Failed!";
@@ -50,17 +50,27 @@ public class AuthManager : MonoBehaviour
                     _message = "Account does not exist";
                     break;
             }
-            ServerSend.Login(_clientId, false, _message);
+            ServerSend.LoginFailed(_clientId, _message);
         }
         else
         {
-            string _message = "Login Success";
-            ServerSend.Login(_clientId, true, _message, _username);
+            if(GameManager.instance.isGameSession)
+            {
+                ServerSend.LoginFailed(_clientId, "Can't join, lobby Is full");
+                return;
+            }
+            
+            if(LobbyManager.instance.IsLobbyFull())
+            {
+                ServerSend.LoginFailed(_clientId, "Can't join, the game is already playing");
+                return;
+            }
+            
+            ServerSend.LoginSuccess(_clientId);
+            Debug.Log("Client " + _clientId + " is logged in, welcome " + _username);
 
             PlayerManager.instance.NewPlayer(_clientId, _username);
             PlayerManager.instance.SendIntoLobby(_clientId);
-
-            Debug.Log("Client " + _clientId + " is logged in, welcome " + _username);
         }
     }
 
@@ -87,7 +97,7 @@ public class AuthManager : MonoBehaviour
         
     }
 
-    public User Authenticate(string _username, string _password)
+    public void Authenticate(string _username, string _password)
     {
         foreach(User _user in users)
         {
@@ -96,18 +106,17 @@ public class AuthManager : MonoBehaviour
                 if(_password != _user.password)
                 {
                     error = AuthError.WrongPassword;
-                    return _user;
+                    return;
                 }
                 else
                 {
                     error = AuthError.None;
-                    return null;
+                    return;
                 }
             }
         }
 
         error = AuthError.UserNotFound;
-        return null;
     }
 
     public void CreateNewUser(string _username, string _password)

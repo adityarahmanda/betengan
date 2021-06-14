@@ -6,7 +6,7 @@ public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager instance;
 
-    public Dictionary<int, Player> players;
+    public Dictionary<int, Player> players = new Dictionary<int, Player>();
 
     private void Awake()
     {
@@ -21,10 +21,6 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    private void Start() {
-        players = new Dictionary<int, Player>();
-    }
-
     public void NewPlayer(int _playerId, string _username, Team _team)
     {
         Player _player = new Player(_playerId, _username, _team);
@@ -36,7 +32,12 @@ public class PlayerManager : MonoBehaviour
         players.Remove(_playerId);
     }
 
-     public bool IsPlayerExist(int _playerId)
+    public Player GetPlayer(int _playerId)
+    {
+        return players[_playerId];
+    }
+
+    public bool IsPlayerExist(int _playerId)
     {
         return players.ContainsKey(_playerId); 
     }

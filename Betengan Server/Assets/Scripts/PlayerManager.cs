@@ -6,7 +6,7 @@ public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager instance;
 
-    public Dictionary<int, Player> players;
+    public Dictionary<int, Player> players = new Dictionary<int, Player>();
 
     public int maxTeamPlayers = 4;
 
@@ -22,10 +22,6 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    private void Start() {
-        players = new Dictionary<int, Player>();
-    }
-
     public void NewPlayer(int _playerId, string _username)
     {
         int redTeamMembers = CountTeamMembers(Team.RedTeam);
@@ -39,11 +35,8 @@ public class PlayerManager : MonoBehaviour
         
         Player player = new Player(_playerId, _username, _playerTeam);
         players.Add(_playerId, player);
-    }
 
-    public void RemovePlayer(int _playerId)
-    {
-        players.Remove(_playerId);
+        Server.clients[_playerId].player = player;
     }
 
     public bool IsPlayerExist(int _playerId)
@@ -53,19 +46,24 @@ public class PlayerManager : MonoBehaviour
 
     public void SendIntoLobby(int _playerId)
     {
-        // Send all players to the new player
         foreach (Player _player in players.Values)
         {
-            if (_player.id != _playerId)
-            {
-                ServerSend.SendIntoLobby(_playerId, _player);
+            ServerSend.SendIntoLobby(_playerId, _player);
+        }
+
+        foreach (Player _player in players.Values)
+        {
+            if(_player.id != _playerId)
+            { 
+                ServerSend.SendIntoLobby(_player.id, players[_playerId]);
             }
         }
 
-        // Send the new player to all players (including himself)
-        foreach (Player _player in players.Values)
+        if(LobbyManager.instance.roomMasterId == 0)
         {
-            ServerSend.SendIntoLobby(_player.id, players[_playerId]);
+            LobbyManager.instance.SetRoomMaster(_playerId);
+        } else {
+            ServerSend.SendRoomMaster();   
         }
     }
 
@@ -88,5 +86,22 @@ public class PlayerManager : MonoBehaviour
             players[_playerId].team = _team;
             ServerSend.ChangeTeam(_playerId, _team);
         }
+    }
+
+    public int GetTotalPlayers()
+    {
+        return players.Count;
+    }
+
+    public int GetFirstPlayerId()
+    {
+        if(players.Count != 0)
+        {
+            foreach (Player _player in players.Values)
+            {
+                return _player.id;
+            }
+        }
+        return 0;
     }
 }

@@ -22,13 +22,16 @@ public class ClientHandle : MonoBehaviour
     public static void Login(Packet _packet)
     {
         bool _success = _packet.ReadBool();
-        string _message = _packet.ReadString();
-        AuthManager.instance.statusText.text = _message;
 
         if(_success) 
         {
             GameManager.instance.StartLobbySession();
             CanvasManager.instance.SwitchCanvas(CanvasType.Lobby);
+        }
+        else
+        {
+            string _message = _packet.ReadString();
+            AuthManager.instance.statusText.text = _message;
         }
     }
 
@@ -44,21 +47,28 @@ public class ClientHandle : MonoBehaviour
 
     public static void SendIntoLobby(Packet _packet)
     {
-        int _id = _packet.ReadInt();
+        int _playerId = _packet.ReadInt();
         string _username = _packet.ReadString();
         Team _team = (Team)_packet.ReadInt();
 
-        PlayerManager.instance.NewPlayer(_id, _username, _team);
-        LobbyManager.instance.InstantiatePlayerUsername(_id);
+        PlayerManager.instance.NewPlayer(_playerId, _username, _team);
+        LobbyManager.instance.InstantiatePlayerUsername(_playerId, _username, _team);
+    }
+
+    public static void RoomMaster(Packet _packet)
+    {
+        int _playerId = _packet.ReadInt();
+
+        LobbyManager.instance.SetRoomMaster(_playerId);
     }
 
     public static void ChangeTeam(Packet _packet)
     {
-        int _id = _packet.ReadInt();
+        int _playerId = _packet.ReadInt();
         Team _team = (Team)_packet.ReadInt();
 
-        PlayerManager.instance.players[_id].team = _team;
-        LobbyManager.instance.UpdateTeamList(_id);
+        PlayerManager.instance.players[_playerId].team = _team;
+        LobbyManager.instance.ChangeTeam(_playerId, _team);
     }
 
     public static void StartGame(Packet _packet)

@@ -12,6 +12,7 @@ public enum ServerPackets
     login,
     signUp,
     sendIntoLobby,
+    roomMaster,
     changeTeam,
     startGame,
     playerPosition,

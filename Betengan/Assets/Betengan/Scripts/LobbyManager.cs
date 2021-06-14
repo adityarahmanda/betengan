@@ -7,6 +7,8 @@ using TMPro;
 public class LobbyManager : MonoBehaviour
 {
     public static LobbyManager instance;
+    public int maxTeamPlayers = 4;
+    public string roomMasterLabel = "(RM)";
 
     [Header("UI References")]
     public Transform redTeamPlayersList;
@@ -16,11 +18,12 @@ public class LobbyManager : MonoBehaviour
     public CustomButton blueTeamSelectButton;
 
     public Button startGameButton;
+    public TextMeshProUGUI startGameStatusText;
 
     [Header("UI Prefabs")]
-    public TextMeshProUGUI usernameTextPrefabs;
+    public PlayerUsername usernameTextPrefabs;
 
-    public Dictionary<int, TextMeshProUGUI> playerUsernameTexts;
+    public Dictionary<int, PlayerUsername> playerUsernameTexts = new Dictionary<int, PlayerUsername>();
 
     private void Awake()
     {
@@ -36,27 +39,19 @@ public class LobbyManager : MonoBehaviour
 
     private void Start() 
     {
-        playerUsernameTexts = new Dictionary<int, TextMeshProUGUI>();
-
         redTeamSelectButton.button.onClick.AddListener(() => ClientSend.SelectTeam(Team.RedTeam));
         blueTeamSelectButton.button.onClick.AddListener(() => ClientSend.SelectTeam(Team.BlueTeam));
 
         startGameButton.onClick.AddListener(() => ClientSend.RequestStartGame());
     }
 
-    public void InstantiatePlayerUsername(int _playerId)
+    public void InstantiatePlayerUsername(int _playerId, string _username, Team _team)
     {
-        Player _player = PlayerManager.instance.players[_playerId];
+        PlayerUsername playerUsernameText = Instantiate(usernameTextPrefabs, GetPlayerTeamList(_team), false);
+        playerUsernameText.SetUsernameText(_username);
+        playerUsernameTexts.Add(_playerId, playerUsernameText);
         
-        TextMeshProUGUI playerUsernameText = Instantiate(usernameTextPrefabs, GetPlayerTeamList(_player.team), true);
-        playerUsernameText.text = _player.username;
-
-        playerUsernameTexts.Add(_player.id, playerUsernameText);
-
-        if(Client.instance.myId == _playerId)
-        {
-            DisableTeamSelectButton(_player.team);
-        }
+        CheckSelectionButton();
     }
 
     public void RemovePlayerUsername(int _playerId)
@@ -66,15 +61,48 @@ public class LobbyManager : MonoBehaviour
         playerUsernameTexts.Remove(_playerId);
     }
 
-    public void UpdateTeamList(int _playerId)
+    public void ChangeTeam(int _playerId, Team _team)
     {
-        Player _player = PlayerManager.instance.players[_playerId];
+        playerUsernameTexts[_playerId].transform.SetParent(GetPlayerTeamList(_team), false);
+        
+        CheckSelectionButton();
+    }
 
-        playerUsernameTexts[_player.id].transform.SetParent(GetPlayerTeamList(_player.team));
+    public void CheckSelectionButton()
+    {
+        int _clientId = Client.instance.myId;
 
-        if(Client.instance.myId == _playerId)
+        if(PlayerManager.instance.IsPlayerExist(_clientId))
         {
-            DisableTeamSelectButton(_player.team);
+            Player _localPlayer = PlayerManager.instance.GetPlayer(_clientId);
+            SetSelectButton(_localPlayer.team, false, "Selected");
+            
+            if(_localPlayer.team == Team.RedTeam) {
+                if(blueTeamPlayersList.childCount == maxTeamPlayers) {
+                    SetSelectButton(Team.BlueTeam, false, "Full");
+                } else {
+                    SetSelectButton(Team.BlueTeam, true, "Select");
+                }
+            } else if(_localPlayer.team == Team.BlueTeam) {
+                if(redTeamPlayersList.childCount == maxTeamPlayers) {
+                    SetSelectButton(Team.RedTeam, false, "Full");
+                } else {
+                    SetSelectButton(Team.RedTeam, true, "Select");
+                }
+            }
+        }
+    }
+
+    public void SetSelectButton(Team _team, bool _interactable, string _text)
+    {
+        if(_team == Team.RedTeam)
+        {
+            redTeamSelectButton.button.interactable = _interactable;
+            redTeamSelectButton.text = _text;
+        } else if(_team == Team.BlueTeam)
+        {  
+            blueTeamSelectButton.button.interactable = _interactable;
+            blueTeamSelectButton.text = _text;
         }
     }
 
@@ -88,23 +116,14 @@ public class LobbyManager : MonoBehaviour
         return null;
     }
 
-    private void DisableTeamSelectButton(Team _team)
+    public void SetRoomMaster(int _roomMasterId)
     {
-        if(_team == Team.RedTeam)
-        {
-            redTeamSelectButton.button.interactable = false;
-            redTeamSelectButton.text = "Selected";
+        playerUsernameTexts[_roomMasterId].SetLabelText(roomMasterLabel);
 
-            blueTeamSelectButton.button.interactable = true;
-            blueTeamSelectButton.text = "Select";
-        } 
-        else if(_team == Team.BlueTeam)
+        if(Client.instance.myId == _roomMasterId)
         {
-            redTeamSelectButton.button.interactable = true;
-            redTeamSelectButton.text = "Select";
-
-            blueTeamSelectButton.button.interactable = false;
-            blueTeamSelectButton.text = "Selected";
+            startGameStatusText.gameObject.SetActive(false);
+            startGameButton.gameObject.SetActive(true);
         }
     }
 }

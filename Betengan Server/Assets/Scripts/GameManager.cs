@@ -63,5 +63,7 @@ public class GameManager : MonoBehaviour
     {
         StartGameSession();
         ServerSend.StartGame();
+
+        Debug.Log("Starting Game...");
     }
 }

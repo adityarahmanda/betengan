@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class ServerSend
 {
+    #region SendDataMethods
     private static void SendTCPData(int _toClient, Packet _packet)
     {
         _packet.WriteLength();
@@ -29,7 +30,7 @@ public class ServerSend
         _packet.WriteLength();
         for (int i = 1; i <= Server.MaxPlayers; i++)
         {
-            if (i != _exceptClient)
+            if(Server.clients[i].id != _exceptClient)
             {
                 Server.clients[i].tcp.SendData(_packet);
             }
@@ -50,12 +51,37 @@ public class ServerSend
         _packet.WriteLength();
         for (int i = 1; i <= Server.MaxPlayers; i++)
         {
-            if (i != _exceptClient)
+            if(Server.clients[i].id != _exceptClient)
             {
                 Server.clients[i].udp.SendData(_packet);
             }
         }
     }
+
+    private static void SendTCPDataToAllPlayers(Packet _packet)
+    {
+        _packet.WriteLength();
+        for (int i = 1; i <= Server.MaxPlayers; i++)
+        {
+            if(Server.clients[i].player != null)
+            {
+                Server.clients[i].tcp.SendData(_packet);
+            }
+        }
+    }
+
+    private static void SendUDPDataToAllPlayers(Packet _packet)
+    {
+        _packet.WriteLength();
+        for (int i = 1; i <= Server.MaxPlayers; i++)
+        {
+            if(Server.clients[i].player != null)
+            {
+                Server.clients[i].udp.SendData(_packet);
+            }
+        }
+    }
+    #endregion
 
     #region Packets
     public static void TCPTest(int _toClient)
@@ -76,15 +102,23 @@ public class ServerSend
         }
     }
 
-    public static void Login(int _id, bool _value, string _message, string _username = null)
+    public static void LoginFailed(int _id, string _message)
     {
         using (Packet _packet = new Packet((int)ServerPackets.login))
         {
-            _packet.Write(_value);
+            _packet.Write(false);
             _packet.Write(_message);
 
-            if(_value) _packet.Write(_username);
+            SendTCPData(_id, _packet);
+        }
+    }
 
+    public static void LoginSuccess(int _id)
+    {
+        using (Packet _packet = new Packet((int)ServerPackets.login))
+        {
+            _packet.Write(true);
+            
             SendTCPData(_id, _packet);
         }
     }
@@ -109,6 +143,16 @@ public class ServerSend
             _packet.Write((int)_player.team);
 
             SendTCPData(_toClient, _packet);
+        }
+    }
+
+    public static void SendRoomMaster()
+    {
+        using (Packet _packet = new Packet((int)ServerPackets.roomMaster))
+        {
+            _packet.Write(LobbyManager.instance.roomMasterId);
+
+            SendTCPDataToAll(_packet);
         }
     }
 

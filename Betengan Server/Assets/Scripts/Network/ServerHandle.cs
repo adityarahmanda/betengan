@@ -8,7 +8,7 @@ public class ServerHandle
     {
         int _clientIdCheck = _packet.ReadInt();  
 
-        Debug.Log($"{Server.clients[_fromClient].tcp.socket.Client.RemoteEndPoint} connected successfully and now player {_fromClient}");
+        Debug.Log($"{Server.clients[_fromClient].tcp.socket.Client.RemoteEndPoint} connected successfully and now client {_fromClient}");
         if (_fromClient != _clientIdCheck)
         {
             Debug.Log($"Player ID: {_fromClient} has assumed the wrong client ID ({_clientIdCheck})!");

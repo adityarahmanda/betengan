@@ -11,6 +11,7 @@ public class Client
     public static int dataBufferSize = 4096;
 
     public int id;
+    public Player player;
 
     public TCP tcp;
     public UDP udp;
@@ -202,16 +203,15 @@ public class Client
 
         ThreadManager.ExecuteOnMainThread(() =>
         {   
-            if(PlayerManager.instance.IsPlayerExist(id))
+            if(player != null)
             {
-                PlayerManager.instance.RemovePlayer(id);
-                
-                /*
-                if(GameManager.instance.isGameSession)
-                {
-                    //Disconnect handler here
-                }
-                */
+                PlayerManager.instance.players.Remove(id);
+                player = null;
+            }
+
+            if(GameManager.instance.isLobbySession && LobbyManager.instance.roomMasterId == id)
+            {
+                LobbyManager.instance.ResetRoomMaster();
             }
         });
 
