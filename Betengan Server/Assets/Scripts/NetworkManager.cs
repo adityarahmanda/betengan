@@ -11,9 +11,6 @@ public class NetworkManager : MonoBehaviour
     public int maxPlayers = 12;
     public int port = 26950;
 
-    [Header("Prefabs")]
-    public GameObject playerPrefabs;
-
     private void Awake()
     {
         if(instance == null)
@@ -38,10 +35,5 @@ public class NetworkManager : MonoBehaviour
     private void OnApplicationQuit()
     {
         Server.CloseSocket();
-    }
-
-    public Player InstantiatePlayer(Vector3 _position, Quaternion _rotation)
-    {
-        return Instantiate(playerPrefabs, _position, _rotation).GetComponent<Player>();
     }
 }

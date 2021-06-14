@@ -128,7 +128,8 @@ public class Server
             { (int)ClientPackets.signUpInput, ServerHandle.SignUpInput },
             { (int)ClientPackets.selectTeam, ServerHandle.SelectTeam },
             { (int)ClientPackets.requestStartGame, ServerHandle.RequestStartGame },
-            { (int)ClientPackets.playerInput, ServerHandle.PlayerInput },
+            { (int)ClientPackets.gameSceneLoaded, ServerHandle.GameSceneLoaded },
+            { (int)ClientPackets.playerInput, ServerHandle.PlayerInput }
         };
     }
 }

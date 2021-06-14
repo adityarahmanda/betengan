@@ -56,13 +56,13 @@ public class AuthManager : MonoBehaviour
         {
             if(GameManager.instance.isGameSession)
             {
-                ServerSend.LoginFailed(_clientId, "Can't join, lobby Is full");
+                ServerSend.LoginFailed(_clientId, "Can't join, the game is already playing");
                 return;
             }
             
             if(LobbyManager.instance.IsLobbyFull())
             {
-                ServerSend.LoginFailed(_clientId, "Can't join, the game is already playing");
+                ServerSend.LoginFailed(_clientId, "Can't join, lobby Is full");
                 return;
             }
             

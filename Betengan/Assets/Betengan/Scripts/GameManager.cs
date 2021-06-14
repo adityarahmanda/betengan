@@ -41,4 +41,17 @@ public class GameManager : MonoBehaviour
         StartGameSession();
         SceneManager.LoadScene("Game");
     }
+
+
+    public void SetWinner(Team _winnerTeam)
+    {
+        if(_winnerTeam == Team.RedTeam)
+        {
+            Debug.Log("Red Team Wins!");
+        } 
+        else if(_winnerTeam == Team.BlueTeam) 
+        {
+            Debug.Log("Blue Team Wins!");
+        }
+    }
 }

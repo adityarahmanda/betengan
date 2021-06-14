@@ -26,4 +26,9 @@ public class CameraController : MonoBehaviour
             transform.position = Vector3.Slerp(transform.position, nextPos, SmoothFactor);
         }
     }
+
+    public void Follow(Transform _target)
+    {
+        followTarget = _target;
+    }
 }

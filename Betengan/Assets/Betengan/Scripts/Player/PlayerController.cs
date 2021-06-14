@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("Movement")]
-    public bool canMove = true;
-    public float moveSpeed;
+    public int id;
+    public Team team;
+
     private Vector2 movement;
 
     [Header("Power")]
@@ -14,67 +15,35 @@ public class PlayerController : MonoBehaviour
     private bool isRegeneratePower;
 
     [Header("Reference")]
-    public PlayerHands hands;
     public ProgressBar powerBar;
+    public TextMeshPro usernameText;
 
-    private Rigidbody2D rb;
     private Animator anim;
 
     private void Awake() {
-        rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+    }
+
+    public void Initialize(int _playerId, string _username)
+    {
+        id = _playerId;
+        usernameText.text = _username;
     }
 
     private void Update()
     {
-        if(canMove)
-        {
-            //Character Movement 
-            movement.x = Input.GetAxisRaw("Horizontal");
-            movement.y = Input.GetAxisRaw("Vertical");
-
-            if(movement.sqrMagnitude > 0)
-            {
-                Vector3 characterScale = transform.localScale;
-                if(movement.x < 0)
-                {
-                    characterScale.x = -1;
-                }
-                if(movement.x > 0)
-                {
-                    characterScale.x = 1;
-                }
-                transform.localScale = characterScale;
-
-                anim.SetBool("isRun", true);
-            }
-            else
-            {
-                anim.SetBool("isRun", false);
-            }
-        }
-
-        /*
-        if(power > 0 && !isRegeneratePower)
-        {
-            power -= Time.deltaTime * GameManager.instance.powerDecreaseSpeed;
-            if(power < 0) power = 0;
-
-            powerBar.SetFillAmount(power);
-        }
-
-        if(power < 100 && isRegeneratePower)
-        {
-            power += Time.deltaTime * GameManager.instance.powerRegenerateSpeed;
-            if(power > 100) power = 100;
-
-            powerBar.SetFillAmount(power);
-        }
-        */
+        MovementInput();
     }
 
-    private void FixedUpdate() {
-        rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
+    public void MovementInput()
+    {
+        if(id == Client.instance.myId)
+        {
+            movement.x = Input.GetAxisRaw("Horizontal");
+            movement.y = Input.GetAxisRaw("Vertical");
+            
+            ClientSend.PlayerInput(movement);
+        }
     }
 
     public void SetPosition(Vector2 _pos)
@@ -82,34 +51,22 @@ public class PlayerController : MonoBehaviour
         transform.position = _pos;
     }
 
+    public void SetScaleX(float scaleX)
+    {
+        Vector3 characterScale = transform.localScale;
+        characterScale.x = scaleX;
+
+        transform.localScale = characterScale;
+    }
+
     public void SetAnimation(string _name, bool _value)
     {
         anim.SetBool(_name, _value);
     }
 
-    /*
-    private void OnTriggerEnter2D(Collider2D other) {
-        if(team == Team.RedTeam && other.gameObject.tag == "Red Team Base")
-        {
-            isRegeneratePower = true;
-        }
-
-        if(team == Team.BlueTeam && other.gameObject.tag == "Blue Team Base")
-        {
-            isRegeneratePower = true;
-        }
+    public void SetPower(float _power)
+    {
+        power = _power;
+        powerBar.SetFillAmount(_power);
     }
-
-    private void OnTriggerExit2D(Collider2D other) {
-        if(team == Team.RedTeam && other.gameObject.tag == "Red Team Base")
-        {
-            isRegeneratePower = false;
-        }
-    
-        if(team == Team.BlueTeam && other.gameObject.tag == "Blue Team Base")
-        {
-            isRegeneratePower = false;
-        }
-    }
-    */
 }

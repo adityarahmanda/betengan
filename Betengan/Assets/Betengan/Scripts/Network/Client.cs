@@ -282,6 +282,13 @@ public class Client : MonoBehaviour
             { (int)ServerPackets.roomMaster, ClientHandle.RoomMaster },
             { (int)ServerPackets.changeTeam, ClientHandle.ChangeTeam },
             { (int)ServerPackets.startGame, ClientHandle.StartGame },
+            { (int)ServerPackets.spawnAllPlayers, ClientHandle.SpawnAllPlayers },
+            { (int)ServerPackets.playerPosition, ClientHandle.PlayerPosition },
+            { (int)ServerPackets.playerScaleX, ClientHandle.PlayerScaleX },
+            { (int)ServerPackets.playerAnimation, ClientHandle.PlayerAnimation },
+            { (int)ServerPackets.playerPower, ClientHandle.PlayerPower },
+            { (int)ServerPackets.prisonGate, ClientHandle.PrisonGate },
+            { (int)ServerPackets.winner, ClientHandle.SetWinner },
             { (int)ServerPackets.playerDisconnected, ClientHandle.PlayerDisconnected },
         };
     }

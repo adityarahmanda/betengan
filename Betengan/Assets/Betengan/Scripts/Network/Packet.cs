@@ -15,8 +15,13 @@ public enum ServerPackets
     roomMaster,
     changeTeam,
     startGame,
+    spawnAllPlayers,
     playerPosition,
+    playerScaleX,
     playerAnimation,
+    playerPower,
+    prisonGate,
+    winner,
     playerDisconnected
 }
 
@@ -28,6 +33,7 @@ public enum ClientPackets
     signUpInput,
     selectTeam,
     requestStartGame,
+    gameSceneLoaded,
     playerInput
 }
 

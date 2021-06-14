@@ -6,9 +6,7 @@ using TMPro;
 public class PrisonGate : MonoBehaviour
 {
     public Team teamOwner;
-    public float hideDuration;
 
-    private Collider2D[] colliders;
     private SpriteRenderer spriteRenderer;
 
     public PrisonGateHUD HUD;
@@ -16,25 +14,22 @@ public class PrisonGate : MonoBehaviour
 
     private void Awake() 
     {
-        colliders = GetComponentsInChildren<Collider2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    private void Start() {
+    private void Start() 
+    {
         HUD.SetEnabled(false);
     }
 
-    private void ShowGate(bool value)
+    public void OpenPrisonGate(float _duration)
     {
-        for(int i = 0; i < colliders.Length; i++)
-        {
-            colliders[i].enabled = value;
-        }
-        spriteRenderer.enabled = value;
+        StartCoroutine(OpenGateForSeconds(_duration));
     }
 
-    IEnumerator OpenGateForSeconds(float seconds){
-        ShowGate(false);
+    IEnumerator OpenGateForSeconds(float seconds)
+    {
+        spriteRenderer.enabled = false;
         HUD.SetEnabled(true);
 
         float waitSeconds = 0;
@@ -45,20 +40,8 @@ public class PrisonGate : MonoBehaviour
             progressBar.SetFillAmount(progress);
             yield return null; 
         }
-
-        ShowGate(true);
+        
+        spriteRenderer.enabled = true;
         HUD.SetEnabled(false);
-    }
-
-    private void OnTriggerEnter2D(Collider2D other) {
-        if(teamOwner == Team.RedTeam && other.gameObject.tag == "Blue Team")
-        {
-            StartCoroutine(OpenGateForSeconds(hideDuration));
-        }
-
-        if(teamOwner == Team.BlueTeam && other.gameObject.tag == "Red Team")
-        {
-            StartCoroutine(OpenGateForSeconds(hideDuration));
-        }
     }
 }

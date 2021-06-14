@@ -4,12 +4,7 @@ using UnityEngine;
 
 public class PlayerHands : MonoBehaviour
 {
-    private Player player;
-
-    private void Awake()
-    {
-        player = transform.parent.gameObject.GetComponent<Player>();
-    }
+    private PlayerController player;
 
     /*
     private void OnTriggerEnter2D(Collider2D other) {

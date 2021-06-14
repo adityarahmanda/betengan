@@ -45,6 +45,13 @@ public class ServerHandle
 
     public static void PlayerInput(int _fromClient, Packet _packet)
     {
-        //Read Player Input Here
+        Vector2 inputs = _packet.ReadVector2(); 
+
+        PlayerManager.instance.players[_fromClient].controller.MovementInput(inputs);
+    }
+
+    public static void GameSceneLoaded(int _fromClient, Packet _packet)
+    {
+        ServerSend.SpawnAllPlayers(_fromClient);
     }
 }

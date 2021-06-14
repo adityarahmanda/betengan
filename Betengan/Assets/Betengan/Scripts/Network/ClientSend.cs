@@ -67,17 +67,21 @@ public class ClientSend : MonoBehaviour
         }
     }
 
-    public static void PlayerInput(bool[] _inputs)
+    public static void PlayerInput(Vector2 _movementInput)
     {
         using (Packet _packet = new Packet((int)ClientPackets.playerInput))
         {
-            _packet.Write(_inputs.Length);
-            for(int i = 0; i < _inputs.Length; i++)
-            {
-                _packet.Write(_inputs[i]);
-            }
+            _packet.Write(_movementInput);
 
-            SendUDPData(_packet);
+            SendTCPData(_packet);
+        }
+    }
+
+    public static void GameSceneLoaded()
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.gameSceneLoaded))
+        {
+            SendTCPData(_packet);
         }
     }
     #endregion

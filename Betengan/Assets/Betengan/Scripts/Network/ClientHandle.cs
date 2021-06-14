@@ -76,39 +76,90 @@ public class ClientHandle : MonoBehaviour
         GameManager.instance.StartGame();
     }
 
+    public static void SpawnAllPlayers(Packet _packet)
+    {
+        int _playersLength = _packet.ReadInt();
+
+        for(int i = 0; i < _playersLength; i++)
+        {
+            int _playerId = _packet.ReadInt();
+            Vector2 _spawnPos = _packet.ReadVector2();
+
+            GameSceneManager.instance.SpawnPlayer(_playerId, _spawnPos);
+        }
+    }
+
     public static void PlayerPosition(Packet _packet)
     {   
-        int _id = _packet.ReadInt();
-        Vector2 _pos = _packet.ReadVector2();
+        int _playerId = _packet.ReadInt();
+        Vector2 _position = _packet.ReadVector2();
 
-        if(PlayerManager.instance.players.ContainsKey(_id))
+        if(PlayerManager.instance.IsPlayerExist(_playerId))
         {
-            //PlayerManager.instance.players[_id].SetPosition(_pos);
+            PlayerManager.instance.players[_playerId].controller.SetPosition(_position);
+        }
+    }
+
+    public static void PlayerScaleX(Packet _packet)
+    {   
+        int _playerId = _packet.ReadInt();
+        float _scaleX = _packet.ReadFloat();
+
+        if(PlayerManager.instance.IsPlayerExist(_playerId))
+        {
+            PlayerManager.instance.players[_playerId].controller.SetScaleX(_scaleX);
         }
     }
 
     public static void PlayerAnimation(Packet _packet)
     {   
-        int _id = _packet.ReadInt();
+        int _playerId = _packet.ReadInt();
         string _name = _packet.ReadString();
         bool _value = _packet.ReadBool();
 
-        if(PlayerManager.instance.players.ContainsKey(_id))
+        if(PlayerManager.instance.IsPlayerExist(_playerId))
         {
-            //PlayerManager.instance.players[_id].SetAnimation(_name, _value);
+            PlayerManager.instance.players[_playerId].controller.SetAnimation(_name, _value);
         }
     }
 
+    public static void PlayerPower(Packet _packet)
+    {   
+        int _playerId = _packet.ReadInt();
+        float _power = _packet.ReadFloat();
+
+        if(PlayerManager.instance.IsPlayerExist(_playerId))
+        {
+            PlayerManager.instance.players[_playerId].controller.SetPower(_power);
+        }
+    }
+
+    public static void PrisonGate(Packet _packet)
+    {   
+        Team _teamChest = (Team)_packet.ReadInt();
+        float _openDuration = _packet.ReadFloat();
+
+        GameSceneManager.instance.OpenPrisonGate(_teamChest, _openDuration);
+    }
+
+    public static void SetWinner(Packet _packet)
+    {   
+        Team _winnerTeam = (Team)_packet.ReadInt();
+
+        GameManager.instance.SetWinner(_winnerTeam);
+    }
+
+
     public static void PlayerDisconnected(Packet _packet)
     {
-        int _id = _packet.ReadInt();
+        int _playerId = _packet.ReadInt();
 
-        PlayerManager.instance.RemovePlayer(_id);
+        PlayerManager.instance.RemovePlayer(_playerId);
         if(GameManager.instance.isLobbySession)
         {
-            LobbyManager.instance.RemovePlayerUsername(_id);
+            LobbyManager.instance.RemovePlayerUsername(_playerId);
         }
 
-        Debug.Log("player " + _id + " is disconnected");
+        Debug.Log("player " + _playerId + " is disconnected");
     }
 }

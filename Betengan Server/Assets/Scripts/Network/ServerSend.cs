@@ -175,13 +175,94 @@ public class ServerSend
         }
     }
 
-    public static void PlayerDisconnected(int _id)
+    public static void SpawnAllPlayers(int _toClient)
+    {
+        using (Packet _packet = new Packet((int)ServerPackets.spawnAllPlayers))
+        {
+            _packet.Write(PlayerManager.instance.GetTotalPlayers());
+            foreach(Player _player in PlayerManager.instance.players.Values)
+            {
+                _packet.Write(_player.id);
+                _packet.Write(_player.controller.transform.position);
+            }
+
+            SendTCPData(_toClient, _packet);
+        }
+    }
+
+    public static void PlayerPosition(int _playerId, Vector2 _position)
+    {
+        using (Packet _packet = new Packet((int)ServerPackets.playerPosition))
+        {
+            _packet.Write(_playerId);
+            _packet.Write(_position);
+
+            SendTCPDataToAll(_packet);
+        }
+    }
+
+    public static void PlayerScaleX(int _playerId, float scaleX)
+    {
+        using (Packet _packet = new Packet((int)ServerPackets.playerScaleX))
+        {
+            _packet.Write(_playerId);
+            _packet.Write(scaleX);
+
+            SendTCPDataToAll(_packet);
+        }
+    }
+
+    public static void PlayerAnimation(int _playerId, string _name, bool _value)
+    {
+        using (Packet _packet = new Packet((int)ServerPackets.playerAnimation))
+        {
+            _packet.Write(_playerId);
+            _packet.Write(_name);
+            _packet.Write(_value);
+
+            SendTCPDataToAll(_packet);
+        }
+    }
+
+    public static void PlayerPower(int _playerId, float _power)
+    {
+        using (Packet _packet = new Packet((int)ServerPackets.playerPower))
+        {
+            _packet.Write(_playerId);
+            _packet.Write(_power);
+
+            SendTCPDataToAll(_packet);
+        }
+    }
+
+    public static void OpenPrisonGate(Team _teamChest, float _openDuration)
+    {
+        using (Packet _packet = new Packet((int)ServerPackets.prisonGate))
+        {
+            _packet.Write((int)_teamChest);
+            _packet.Write(_openDuration);
+
+            SendTCPDataToAll(_packet);
+        }
+    }
+
+    public static void SetWinner(Team _winnerTeam)
+    {
+        using (Packet _packet = new Packet((int)ServerPackets.winner))
+        {
+            _packet.Write((int)_winnerTeam);
+
+            SendTCPDataToAll(_packet);
+        }
+    }
+
+    public static void PlayerDisconnected(int _playerId)
     {
         using (Packet _packet = new Packet((int)ServerPackets.playerDisconnected))
         {
-            _packet.Write(_id);
+            _packet.Write(_playerId);
 
-            SendTCPDataToAll(_id, _packet);
+            SendTCPDataToAll(_playerId, _packet);
         }
     }
    #endregion
