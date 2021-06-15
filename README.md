@@ -1,4 +1,1 @@
-#Betengan
-
-Description
-Unity Multiplayer Project Inspired From Traditional Indonesian Betengan Game
+Unity Multiplayer Project Inspired From Traditional Indonesian Game, Betengan
