@@ -13,12 +13,12 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed;
     private Vector2 movement;
 
-    private bool isFacingRight;
-    private bool isRunning;
+    private bool isFacingRight = true;
+    private bool isRunning = false;
 
     [Header("Power")]
     public float power = 100f;
-    private bool isRegeneratePower;
+    private bool isRegeneratePower = true;
 
     [Header("Reference")]
     public PlayerHands hands;

@@ -76,10 +76,14 @@ public class ClientHandle : MonoBehaviour
         GameManager.instance.StartGame();
     }
 
-    public static void SpawnAllPlayers(Packet _packet)
+    public static void InitializeGame(Packet _packet)
     {
-        int _playersLength = _packet.ReadInt();
+        //UI
+        int _maxScore = _packet.ReadInt();
+        GameSceneManager.instance.SetMaxScore(_maxScore);
 
+        //spawn player
+        int _playersLength = _packet.ReadInt();
         for(int i = 0; i < _playersLength; i++)
         {
             int _playerId = _packet.ReadInt();
@@ -142,11 +146,23 @@ public class ClientHandle : MonoBehaviour
         GameSceneManager.instance.OpenPrisonGate(_teamChest, _openDuration);
     }
 
-    public static void SetWinner(Packet _packet)
+    public static void RoundWinner(Packet _packet)
     {   
         Team _winnerTeam = (Team)_packet.ReadInt();
+        int _currentRound = _packet.ReadInt();
+        int _redTeamScore = _packet.ReadInt();
+        int _blueTeamScore = _packet.ReadInt();
 
-        GameManager.instance.SetWinner(_winnerTeam);
+        GameSceneManager.instance.RoundWinner(_winnerTeam, _currentRound, _redTeamScore, _blueTeamScore);
+    }
+
+    public static void GameWinner(Packet _packet)
+    {   
+        Team _winnerTeam = (Team)_packet.ReadInt();
+        int _redTeamScore = _packet.ReadInt();
+        int _blueTeamScore = _packet.ReadInt();
+
+        GameSceneManager.instance.GameWinner(_winnerTeam, _redTeamScore, _blueTeamScore);
     }
 
 

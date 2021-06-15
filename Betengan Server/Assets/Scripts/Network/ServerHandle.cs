@@ -52,6 +52,6 @@ public class ServerHandle
 
     public static void GameSceneLoaded(int _fromClient, Packet _packet)
     {
-        ServerSend.SpawnAllPlayers(_fromClient);
+        ServerSend.InitializeGame(_fromClient);
     }
 }

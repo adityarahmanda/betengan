@@ -9,9 +9,19 @@ public class GameSceneManager : MonoBehaviour
 
     public CameraController cameraController;
 
+    [Header("Game Settings")]
+    public int currentRound = 0;
+    public int maxScore;
+    public int redTeamScore = 0;
+    public int blueTeamScore = 0;
+
     [Header("Prison Gates")]
     public PrisonGate redTeamPrisonGate;
     public PrisonGate blueTeamPrisonGate;
+
+    [Header("Team Scores UI")]
+    public ScoreUI redTeamScoreUI;
+    public ScoreUI blueTeamScoreUI;
 
     [Header("Player Prefabs")]
     public PlayerController redTeamPlayerPrefab;
@@ -22,7 +32,6 @@ public class GameSceneManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(this);
         }
         else if (instance != this)
         {
@@ -30,8 +39,17 @@ public class GameSceneManager : MonoBehaviour
         }
     }
 
-    private void Start() {
+    private void Start() 
+    {
         ClientSend.GameSceneLoaded();
+    }
+
+    public void SetMaxScore(int _maxScore)
+    {
+        maxScore = _maxScore;
+
+        redTeamScoreUI.Initialize(maxScore);
+        blueTeamScoreUI.Initialize(maxScore);
     }
 
     public void SpawnPlayer(int _playerId, Vector2 _spawnPos)
@@ -48,6 +66,50 @@ public class GameSceneManager : MonoBehaviour
         }
         
         _player.controller = _controller;
+    }
+
+    public void RoundWinner(Team _winnerTeam, int _currentRound, int _redTeamScore, int _blueTeamScore)
+    {
+        if(_winnerTeam == Team.RedTeam)
+        {
+            Debug.Log("Red team wins the round");
+        } 
+        else if(_winnerTeam == Team.BlueTeam)
+        {
+            Debug.Log("Blue team wins the round");
+        }
+
+        currentRound = _currentRound;
+        SetScores(_redTeamScore, _blueTeamScore);
+    }
+
+    public void GameWinner(Team _winnerTeam, int _redTeamScore, int _blueTeamScore)
+    {   
+        if(_winnerTeam == Team.RedTeam)
+        {
+            Debug.Log("Red team wins the game");
+        } 
+        else if(_winnerTeam == Team.BlueTeam)
+        {
+            Debug.Log("Blue team wins the game");
+        }
+
+        SetScores(_redTeamScore, _blueTeamScore);
+    }
+
+    public void SetScores(int _redTeamScore, int _blueTeamScore)
+    {
+        if(redTeamScore != _redTeamScore)
+        {
+            redTeamScoreUI.SetScore(_redTeamScore);
+            redTeamScore = _redTeamScore;
+        }
+
+        if(blueTeamScore != _blueTeamScore)
+        {
+            blueTeamScoreUI.SetScore(_blueTeamScore);
+            blueTeamScore = _blueTeamScore;
+        }
     }
 
     public void OpenPrisonGate(Team _teamChest, float _openDuration)

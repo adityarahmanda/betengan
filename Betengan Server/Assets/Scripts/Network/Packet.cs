@@ -15,13 +15,14 @@ public enum ServerPackets
     roomMaster,
     changeTeam,
     startGame,
-    spawnAllPlayers,
+    initGame,
     playerPosition,
     playerScaleX,
     playerAnimation,
     playerPower,
     prisonGate,
-    winner,
+    roundWinner,
+    gameWinner,
     playerDisconnected
 }
 
