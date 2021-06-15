@@ -29,6 +29,10 @@ public class PlayerManager : MonoBehaviour
 
     public void RemovePlayer(int _playerId)
     {
+        if(players[_playerId].controller != null)
+        {
+            Destroy(players[_playerId].controller.gameObject);
+        }
         players.Remove(_playerId);
     }
 
@@ -40,5 +44,10 @@ public class PlayerManager : MonoBehaviour
     public bool IsPlayerExist(int _playerId)
     {
         return players.ContainsKey(_playerId); 
+    }
+    
+    public int GetTotalPlayer()
+    {
+        return players.Count;
     }
 }

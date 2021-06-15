@@ -7,6 +7,10 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
+    public bool paused = false;
+    public int maxScore;
+    public int roundCountdownTime;
+
     [Header("Sessions")]
     public bool isLobbySession;
     public bool isGameSession;
@@ -28,30 +32,26 @@ public class GameManager : MonoBehaviour
     {
         isLobbySession = true;
         isGameSession = false;
+
+        SceneManager.LoadScene("Lobby");
     }
 
-    public void StartGameSession()
+    public void StartGameSession(int _maxScore, int _roundCountdownTime)
     {
         isLobbySession = false;
         isGameSession = true;
-    }
-
-    public void StartGame()
-    {
-        StartGameSession();
+        
+        maxScore = _maxScore;
+        roundCountdownTime = _roundCountdownTime;
+        
         SceneManager.LoadScene("Game");
     }
 
-
-    public void SetWinner(Team _winnerTeam)
+    public void EndGameSession()
     {
-        if(_winnerTeam == Team.RedTeam)
-        {
-            Debug.Log("Red Team Wins!");
-        } 
-        else if(_winnerTeam == Team.BlueTeam) 
-        {
-            Debug.Log("Blue Team Wins!");
-        }
+        maxScore = 0;
+        roundCountdownTime = 0;
+
+        StartLobbySession();
     }
 }

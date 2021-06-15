@@ -2,26 +2,31 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class GameSceneManager : MonoBehaviour
 {
     public static GameSceneManager instance;
 
+    public int currentRound;
     public CameraController cameraController;
-
-    [Header("Game Settings")]
-    public int currentRound = 0;
-    public int maxScore;
-    public int redTeamScore = 0;
-    public int blueTeamScore = 0;
 
     [Header("Prison Gates")]
     public PrisonGate redTeamPrisonGate;
     public PrisonGate blueTeamPrisonGate;
 
-    [Header("Team Scores UI")]
+    [Header("Treasures")]
+    public Treasure redTeamTreasure;
+    public Treasure blueTeamTreasure;
+
+    [Header("Team Score UI")]
     public ScoreUI redTeamScoreUI;
     public ScoreUI blueTeamScoreUI;
+
+    [Header("Text UI")]
+    public TextMeshProUGUI roundText;
+    public TextMeshProUGUI countdownText;
+    public TextMeshProUGUI winnerText;
 
     [Header("Player Prefabs")]
     public PlayerController redTeamPlayerPrefab;
@@ -42,14 +47,9 @@ public class GameSceneManager : MonoBehaviour
     private void Start() 
     {
         ClientSend.GameSceneLoaded();
-    }
 
-    public void SetMaxScore(int _maxScore)
-    {
-        maxScore = _maxScore;
-
-        redTeamScoreUI.Initialize(maxScore);
-        blueTeamScoreUI.Initialize(maxScore);
+        redTeamScoreUI.Initialize(GameManager.instance.maxScore);
+        blueTeamScoreUI.Initialize(GameManager.instance.maxScore);
     }
 
     public void SpawnPlayer(int _playerId, Vector2 _spawnPos)
@@ -68,53 +68,91 @@ public class GameSceneManager : MonoBehaviour
         _player.controller = _controller;
     }
 
-    public void RoundWinner(Team _winnerTeam, int _currentRound, int _redTeamScore, int _blueTeamScore)
+    public void SetScore(Team _team, int _score)
     {
+        if(_team == Team.RedTeam)
+            redTeamScoreUI.SetScore(_score);
+        else if(_team == Team.BlueTeam)
+            blueTeamScoreUI.SetScore(_score);
+    }
+
+    public void OpenPrisonGate(Team _teamPrisonGate, float _openDuration)
+    {
+        if(_teamPrisonGate == Team.RedTeam)
+            redTeamPrisonGate.OpenPrisonGate(_openDuration);
+        if(_teamPrisonGate == Team.BlueTeam)
+            blueTeamPrisonGate.OpenPrisonGate(_openDuration);
+    }
+
+    public void SetRoundWinner(Team _winnerTeam)
+    {
+        GameManager.instance.paused = true;
+        
         if(_winnerTeam == Team.RedTeam)
         {
-            Debug.Log("Red team wins the round");
+            winnerText.text = "Red Team Stealed The Treasure";
+            blueTeamTreasure.OpenTreasure();
         } 
-        else if(_winnerTeam == Team.BlueTeam)
+        else if(_winnerTeam == Team.BlueTeam) 
         {
-            Debug.Log("Blue team wins the round");
+            winnerText.text = "Blue Team Stealed The Treasure";
+            redTeamTreasure.OpenTreasure();
         }
+        winnerText.gameObject.SetActive(true);
+    }
 
+    public void SetGameWinner(Team _winnerTeam)
+    {
+        GameManager.instance.paused = true;
+
+        if(_winnerTeam == Team.RedTeam)
+        {
+            winnerText.text = "Red Team Wins!";
+            blueTeamTreasure.OpenTreasure();
+        } 
+        else if(_winnerTeam == Team.BlueTeam) 
+        {
+            winnerText.text = "Blue Team Wins!";
+            redTeamTreasure.OpenTreasure();
+        }
+        winnerText.gameObject.SetActive(true);
+    }
+
+    public void StartNewRound(int _currentRound)
+    {
         currentRound = _currentRound;
-        SetScores(_redTeamScore, _blueTeamScore);
+        
+        //Reset UI
+        winnerText.gameObject.SetActive(false);
+        
+        //Reset environment
+        redTeamTreasure.CloseTreasure();
+        blueTeamTreasure.CloseTreasure();
+
+        StartCoroutine(StartNewRound());
     }
 
-    public void GameWinner(Team _winnerTeam, int _redTeamScore, int _blueTeamScore)
-    {   
-        if(_winnerTeam == Team.RedTeam)
-        {
-            Debug.Log("Red team wins the game");
-        } 
-        else if(_winnerTeam == Team.BlueTeam)
-        {
-            Debug.Log("Blue team wins the game");
-        }
-
-        SetScores(_redTeamScore, _blueTeamScore);
-    }
-
-    public void SetScores(int _redTeamScore, int _blueTeamScore)
+    public IEnumerator StartNewRound()
     {
-        if(redTeamScore != _redTeamScore)
-        {
-            redTeamScoreUI.SetScore(_redTeamScore);
-            redTeamScore = _redTeamScore;
-        }
+        GameManager.instance.paused = true;
+        int countdownTime = GameManager.instance.roundCountdownTime;
 
-        if(blueTeamScore != _blueTeamScore)
-        {
-            blueTeamScoreUI.SetScore(_blueTeamScore);
-            blueTeamScore = _blueTeamScore;
-        }
-    }
+        roundText.text = "Round " + currentRound;
+        countdownText.text = "Start after " + countdownTime + " second(s)";
 
-    public void OpenPrisonGate(Team _teamChest, float _openDuration)
-    {
-        PrisonGate teamPrisonGate = (_teamChest == Team.RedTeam) ? redTeamPrisonGate : blueTeamPrisonGate;
-        teamPrisonGate.OpenPrisonGate(_openDuration);
+        roundText.gameObject.SetActive(true);
+        countdownText.gameObject.SetActive(true);
+
+        while(countdownTime > 0)
+        {
+            yield return new WaitForSeconds(1f);
+            countdownTime--;
+            countdownText.text = "Start after " + countdownTime + " second(s)";
+        }
+        
+        roundText.gameObject.SetActive(false);
+        countdownText.gameObject.SetActive(false);
+        
+        GameManager.instance.paused = false;
     }
 }

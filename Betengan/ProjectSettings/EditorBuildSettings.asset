@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Betengan/Scenes/MainMenu.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   - enabled: 1
+    path: Assets/Betengan/Scenes/Lobby.unity
+    guid: 88f3c44125355ff4bbe5c5ba02a9b0f2
+  - enabled: 1
     path: Assets/Betengan/Scenes/Game.unity
     guid: da8e7e85401fc264290b98ef3d60ba2f
   m_configObjects: {}

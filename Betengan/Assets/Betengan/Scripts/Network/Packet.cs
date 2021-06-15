@@ -15,14 +15,17 @@ public enum ServerPackets
     roomMaster,
     changeTeam,
     startGame,
-    initGame,
+    spawnPlayers,
+    startNewRound,
     playerPosition,
     playerScaleX,
     playerAnimation,
     playerPower,
     prisonGate,
+    teamScore,
     roundWinner,
     gameWinner,
+    endGame,
     playerDisconnected
 }
 
@@ -32,6 +35,7 @@ public enum ClientPackets
     tcpTestReceived = 1,
     loginInput,
     signUpInput,
+    lobbySceneLoaded,
     selectTeam,
     requestStartGame,
     gameSceneLoaded,

@@ -49,6 +49,14 @@ public class ClientSend : MonoBehaviour
         }
     }
 
+    public static void LobbySceneLoaded()
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.lobbySceneLoaded))
+        {
+            SendTCPData(_packet);
+        }
+    }
+
     public static void SelectTeam(Team _team)
     {
         using (Packet _packet = new Packet((int)ClientPackets.selectTeam))
@@ -67,20 +75,20 @@ public class ClientSend : MonoBehaviour
         }
     }
 
+    public static void GameSceneLoaded()
+    {
+        using (Packet _packet = new Packet((int)ClientPackets.gameSceneLoaded))
+        {
+            SendTCPData(_packet);
+        }
+    }
+
     public static void PlayerInput(Vector2 _movementInput)
     {
         using (Packet _packet = new Packet((int)ClientPackets.playerInput))
         {
             _packet.Write(_movementInput);
 
-            SendTCPData(_packet);
-        }
-    }
-
-    public static void GameSceneLoaded()
-    {
-        using (Packet _packet = new Packet((int)ClientPackets.gameSceneLoaded))
-        {
             SendTCPData(_packet);
         }
     }

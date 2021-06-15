@@ -9,12 +9,12 @@ public class Treasure : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D other) {
         if(teamOwner == Team.RedTeam && other.gameObject.tag == "Blue Team")
         {
-            GameManager.instance.SetRoundWinner(Team.BlueTeam);
+            GameManager.instance.SetWinner(Team.BlueTeam);
         }
 
         if(teamOwner == Team.BlueTeam && other.gameObject.tag == "Red Team")
         {
-            GameManager.instance.SetRoundWinner(Team.RedTeam);;
+            GameManager.instance.SetWinner(Team.RedTeam);;
         }
     }
 }

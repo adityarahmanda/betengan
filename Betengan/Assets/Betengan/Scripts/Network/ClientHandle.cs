@@ -26,7 +26,6 @@ public class ClientHandle : MonoBehaviour
         if(_success) 
         {
             GameManager.instance.StartLobbySession();
-            CanvasManager.instance.SwitchCanvas(CanvasType.Lobby);
         }
         else
         {
@@ -51,7 +50,10 @@ public class ClientHandle : MonoBehaviour
         string _username = _packet.ReadString();
         Team _team = (Team)_packet.ReadInt();
 
-        PlayerManager.instance.NewPlayer(_playerId, _username, _team);
+        if(!PlayerManager.instance.IsPlayerExist(_playerId))
+        {
+            PlayerManager.instance.NewPlayer(_playerId, _username, _team);
+        }
         LobbyManager.instance.InstantiatePlayerUsername(_playerId, _username, _team);
     }
 
@@ -73,16 +75,14 @@ public class ClientHandle : MonoBehaviour
 
     public static void StartGame(Packet _packet)
     {
-        GameManager.instance.StartGame();
+        int _maxScore = _packet.ReadInt();
+        int _roundCountdownTime = _packet.ReadInt();
+
+        GameManager.instance.StartGameSession(_maxScore, _roundCountdownTime);
     }
 
-    public static void InitializeGame(Packet _packet)
+    public static void SpawnPlayers(Packet _packet)
     {
-        //UI
-        int _maxScore = _packet.ReadInt();
-        GameSceneManager.instance.SetMaxScore(_maxScore);
-
-        //spawn player
         int _playersLength = _packet.ReadInt();
         for(int i = 0; i < _playersLength; i++)
         {
@@ -91,6 +91,12 @@ public class ClientHandle : MonoBehaviour
 
             GameSceneManager.instance.SpawnPlayer(_playerId, _spawnPos);
         }
+    }
+
+    public static void StartNewRound(Packet _packet)
+    {
+        int _currentRound = _packet.ReadInt();
+        GameSceneManager.instance.StartNewRound(_currentRound);
     }
 
     public static void PlayerPosition(Packet _packet)
@@ -145,26 +151,33 @@ public class ClientHandle : MonoBehaviour
 
         GameSceneManager.instance.OpenPrisonGate(_teamChest, _openDuration);
     }
-
-    public static void RoundWinner(Packet _packet)
+    
+    public static void TeamScore(Packet _packet)
     {   
-        Team _winnerTeam = (Team)_packet.ReadInt();
-        int _currentRound = _packet.ReadInt();
-        int _redTeamScore = _packet.ReadInt();
-        int _blueTeamScore = _packet.ReadInt();
+        Team _team = (Team)_packet.ReadInt();
+        int _score = _packet.ReadInt();
 
-        GameSceneManager.instance.RoundWinner(_winnerTeam, _currentRound, _redTeamScore, _blueTeamScore);
+        GameSceneManager.instance.SetScore(_team, _score);
     }
 
-    public static void GameWinner(Packet _packet)
+    public static void SetRoundWinner(Packet _packet)
     {   
         Team _winnerTeam = (Team)_packet.ReadInt();
-        int _redTeamScore = _packet.ReadInt();
-        int _blueTeamScore = _packet.ReadInt();
 
-        GameSceneManager.instance.GameWinner(_winnerTeam, _redTeamScore, _blueTeamScore);
+        GameSceneManager.instance.SetRoundWinner(_winnerTeam);
     }
 
+    public static void SetGameWinner(Packet _packet)
+    {   
+        Team _winnerTeam = (Team)_packet.ReadInt();
+
+        GameSceneManager.instance.SetGameWinner(_winnerTeam);
+    }
+
+    public static void EndGame(Packet _packet)
+    {   
+        GameManager.instance.EndGameSession();
+    }
 
     public static void PlayerDisconnected(Packet _packet)
     {

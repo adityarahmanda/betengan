@@ -31,6 +31,11 @@ public class ServerHandle
         AuthManager.instance.SignUpInput(_fromClient, _username, _password);
     }
 
+    public static void LobbySceneLoaded(int _fromClient, Packet _packet)
+    {
+        PlayerManager.instance.SendIntoLobby(_fromClient);
+    }
+
     public static void SelectTeam(int _fromClient, Packet _packet)
     {
         Team _team = (Team)_packet.ReadInt();
@@ -40,7 +45,13 @@ public class ServerHandle
 
     public static void RequestStartGame(int _fromClient, Packet _packet)
     {
-        GameManager.instance.StartGame();
+        GameManager.instance.StartGameSession();
+    }
+
+    public static void GameSceneLoaded(int _fromClient, Packet _packet)
+    {
+        ServerSend.SpawnPlayers(_fromClient);
+        ServerSend.StartNewRound(GameManager.instance.currentRound);
     }
 
     public static void PlayerInput(int _fromClient, Packet _packet)
@@ -48,10 +59,5 @@ public class ServerHandle
         Vector2 inputs = _packet.ReadVector2(); 
 
         PlayerManager.instance.players[_fromClient].controller.MovementInput(inputs);
-    }
-
-    public static void GameSceneLoaded(int _fromClient, Packet _packet)
-    {
-        ServerSend.InitializeGame(_fromClient);
     }
 }

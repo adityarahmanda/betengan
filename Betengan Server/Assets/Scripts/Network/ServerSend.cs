@@ -167,20 +167,21 @@ public class ServerSend
         }
     }
 
-    public static void StartGame()
+    public static void StartGame(int _maxScore, int _roundCountdownTime)
     {
         using (Packet _packet = new Packet((int)ServerPackets.startGame))
         {
+            _packet.Write(_maxScore);
+            _packet.Write(_roundCountdownTime);
+            
             SendTCPDataToAll(_packet);
         }
     }
 
-    public static void InitializeGame(int _toClient)
+    public static void SpawnPlayers(int _toClient)
     {
-        using (Packet _packet = new Packet((int)ServerPackets.initGame))
-        {
-            _packet.Write(GameManager.instance.maxScore);
-            
+        using (Packet _packet = new Packet((int)ServerPackets.spawnPlayers))
+        {   
             _packet.Write(PlayerManager.instance.GetTotalPlayers());
             foreach(Player _player in PlayerManager.instance.players.Values)
             {
@@ -189,6 +190,16 @@ public class ServerSend
             }
 
             SendTCPData(_toClient, _packet);
+        }
+    }
+
+    public static void StartNewRound(int _currentRound)
+    {
+        using (Packet _packet = new Packet((int)ServerPackets.startNewRound))
+        {   
+            _packet.Write(_currentRound);
+
+            SendTCPDataToAll(_packet);
         }
     }
 
@@ -248,27 +259,41 @@ public class ServerSend
         }
     }
 
-    public static void RoundWinner(Team _winnerTeam, int _currentRound, int _redTeamScore, int _blueTeamScore)
+    public static void TeamScore(Team _team, int _score)
     {
-        using (Packet _packet = new Packet((int)ServerPackets.roundWinner))
+        using (Packet _packet = new Packet((int)ServerPackets.teamScore))
         {
-            _packet.Write((int)_winnerTeam);
-            _packet.Write(_currentRound);
-            _packet.Write(_redTeamScore);
-            _packet.Write(_blueTeamScore);
+            _packet.Write((int)_team);
+            _packet.Write(_score);
 
             SendTCPDataToAll(_packet);
         }
     }
-    
-    public static void GameWinner(Team _winnerTeam, int _redTeamScore, int _blueTeamScore)
+
+    public static void SetRoundWinner(Team _winnerTeam)
+    {
+        using (Packet _packet = new Packet((int)ServerPackets.roundWinner))
+        {
+            _packet.Write((int)_winnerTeam);
+
+            SendTCPDataToAll(_packet);
+        }
+    }
+
+    public static void SetGameWinner(Team _winnerTeam)
     {
         using (Packet _packet = new Packet((int)ServerPackets.gameWinner))
         {
             _packet.Write((int)_winnerTeam);
-            _packet.Write(_redTeamScore);
-            _packet.Write(_blueTeamScore);
 
+            SendTCPDataToAll(_packet);
+        }
+    }
+
+    public static void EndGame()
+    {
+        using (Packet _packet = new Packet((int)ServerPackets.endGame))
+        {
             SendTCPDataToAll(_packet);
         }
     }

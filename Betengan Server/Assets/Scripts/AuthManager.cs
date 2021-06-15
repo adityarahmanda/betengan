@@ -70,7 +70,6 @@ public class AuthManager : MonoBehaviour
             Debug.Log("Client " + _clientId + " is logged in, welcome " + _username);
 
             PlayerManager.instance.NewPlayer(_clientId, _username);
-            PlayerManager.instance.SendIntoLobby(_clientId);
         }
     }
 

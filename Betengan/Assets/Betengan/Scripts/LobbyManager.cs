@@ -43,6 +43,8 @@ public class LobbyManager : MonoBehaviour
         blueTeamSelectButton.button.onClick.AddListener(() => ClientSend.SelectTeam(Team.BlueTeam));
 
         startGameButton.onClick.AddListener(() => ClientSend.RequestStartGame());
+
+        ClientSend.LobbySceneLoaded();
     }
 
     public void InstantiatePlayerUsername(int _playerId, string _username, Team _team)

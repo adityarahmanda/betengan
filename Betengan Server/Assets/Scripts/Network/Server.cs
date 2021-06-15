@@ -126,6 +126,7 @@ public class Server
             { (int)ClientPackets.tcpTestReceived, ServerHandle.TcpTestReceived },
             { (int)ClientPackets.loginInput, ServerHandle.LoginInput },
             { (int)ClientPackets.signUpInput, ServerHandle.SignUpInput },
+            { (int)ClientPackets.lobbySceneLoaded, ServerHandle.LobbySceneLoaded },
             { (int)ClientPackets.selectTeam, ServerHandle.SelectTeam },
             { (int)ClientPackets.requestStartGame, ServerHandle.RequestStartGame },
             { (int)ClientPackets.gameSceneLoaded, ServerHandle.GameSceneLoaded },

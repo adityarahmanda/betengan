@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Treasure : MonoBehaviour
 {
-    public Team teamOwner;
-    public Sprite openTreasure;
+    public Sprite openedTreasure;
+    public Sprite closedTreasure;
 
     private SpriteRenderer spriteRenderer;
 
@@ -13,17 +13,11 @@ public class Treasure : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    private void OnCollisionEnter2D(Collision2D other) {
-        if(teamOwner == Team.RedTeam && other.gameObject.tag == "Blue Team")
-        {
-            spriteRenderer.sprite = openTreasure;
-            Debug.Log("Blue Team Wins");
-        }
-
-        if(teamOwner == Team.BlueTeam && other.gameObject.tag == "Red Team")
-        {
-            spriteRenderer.sprite = openTreasure;
-            Debug.Log("Red Team Wins");
-        }
+    public void OpenTreasure() {
+        spriteRenderer.sprite = openedTreasure;
+    }
+    
+    public void CloseTreasure() {
+        spriteRenderer.sprite = closedTreasure;
     }
 }

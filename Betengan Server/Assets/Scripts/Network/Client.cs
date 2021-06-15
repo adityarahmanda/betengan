@@ -205,10 +205,10 @@ public class Client
         {   
             if(player != null)
             {
-                PlayerManager.instance.players.Remove(id);
+                PlayerManager.instance.RemovePlayer(id);
                 player = null;
             }
-
+            
             if(GameManager.instance.isLobbySession && LobbyManager.instance.roomMasterId == id)
             {
                 LobbyManager.instance.ResetRoomMaster();

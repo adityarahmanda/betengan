@@ -39,6 +39,15 @@ public class PlayerManager : MonoBehaviour
         Server.clients[_playerId].player = player;
     }
 
+    public void RemovePlayer(int _playerId)
+    {        
+        if(players[_playerId].controller != null)
+        {
+            Destroy(players[_playerId].controller.gameObject);
+        }
+        players.Remove(_playerId);
+    }
+
     public bool IsPlayerExist(int _playerId)
     {
         return players.ContainsKey(_playerId); 
@@ -85,6 +94,18 @@ public class PlayerManager : MonoBehaviour
         {
             players[_playerId].team = _team;
             ServerSend.ChangeTeam(_playerId, _team);
+        }
+    }
+
+    public void DestroyAllPlayerControllers()
+    {
+        foreach(Player _player in players.Values) 
+        {
+            if(_player.controller != null)
+            {
+                Destroy(_player.controller.gameObject);
+                _player.controller = null;
+            }
         }
     }
 

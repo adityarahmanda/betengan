@@ -32,6 +32,16 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if(GameManager.instance.paused) 
+        {
+            if(movement != Vector2.zero)
+            {
+                movement = Vector2.zero;
+                ClientSend.PlayerInput(movement);
+            }
+            return;
+        }
+
         MovementInput();
     }
 

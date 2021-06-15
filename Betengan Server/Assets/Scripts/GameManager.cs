@@ -13,8 +13,12 @@ public class GameManager : MonoBehaviour
     public bool isGameSession;
 
     [Header("Game Settings")]
-    public int currentRound = 0;
+    public int winPauseTime = 3;
+    public int roundCountdownTime = 5;
     public int maxScore = 2;
+    
+    [Header("Game Status")]
+    public int currentRound = 1;
     public int redTeamScore = 0;
     public int blueTeamScore = 0;
     
@@ -59,22 +63,19 @@ public class GameManager : MonoBehaviour
 
     public void StartGameSession()
     {
+        Debug.Log("Starting Game...");
+
         isLobbySession = false;
         isGameSession = true;
 
-        currentRound = 0;
+        currentRound = 1;
         redTeamScore = 0;
-        blueTeamScore = 0;
-    }
+        blueTeamScore = 0;    
 
-    public void StartGame()
-    {
-        StartGameSession();
-        ServerSend.StartGame();
-
-        Debug.Log("Starting Game...");
         ShowScores();
         SpawnPlayer();
+
+        ServerSend.StartGame(maxScore, roundCountdownTime);
     }
 
     public void SpawnPlayer()
@@ -91,17 +92,24 @@ public class GameManager : MonoBehaviour
             _player.controller = _controller;
         }
     }
+    
+    public void ShowScores()
+    {
+        Debug.Log("Red team score : " + redTeamScore + ", Blue Team Score : " + blueTeamScore);
+    }
 
-    public void SetRoundWinner(Team _winnerTeam)
+    public void SetWinner(Team _winnerTeam)
     {
         if(_winnerTeam == Team.RedTeam)
         {
             redTeamScore++;
+            ServerSend.TeamScore(Team.RedTeam, redTeamScore);
             Debug.Log("Red team wins the round");
         } 
         else if(_winnerTeam == Team.BlueTeam)
         {
             blueTeamScore++;
+            ServerSend.TeamScore(Team.BlueTeam, blueTeamScore);
             Debug.Log("Blue team wins the round");
         }
         ShowScores();
@@ -110,20 +118,21 @@ public class GameManager : MonoBehaviour
         {
             if(redTeamScore >= maxScore)
             {
-                ServerSend.GameWinner(Team.RedTeam, redTeamScore, blueTeamScore);
+                ServerSend.SetGameWinner(Team.RedTeam);
                 Debug.Log("Red team wins the game");
             } 
             else if(blueTeamScore >= maxScore)
             {
-                ServerSend.GameWinner(Team.BlueTeam, redTeamScore, blueTeamScore);
+                ServerSend.SetGameWinner(Team.BlueTeam);
                 Debug.Log("Blue team wins the game");
             }
+
+            StartCoroutine(EndGameAfterTimeout(winPauseTime));
         }
         else
         {
-            currentRound++;
-            ServerSend.RoundWinner(_winnerTeam, currentRound, redTeamScore, blueTeamScore);
-            StartNewRound();
+            ServerSend.SetRoundWinner(_winnerTeam);
+            StartCoroutine(StartNewRoundAfterTimeout(winPauseTime));
         }
     }
 
@@ -134,16 +143,42 @@ public class GameManager : MonoBehaviour
 
     public void StartNewRound()
     {
-        foreach(Player _player in PlayerManager.instance.players.Values)
-        {
-            Vector2 centerPos = (_player.team == Team.RedTeam) ? redTeamBase.position : blueTeamBase.position;
-            _player.controller.transform.position = RandomCircle(centerPos, spawnRadius);
-        }
+        ResetPlayer();
+     
+        currentRound++;
+        ServerSend.StartNewRound(currentRound);
     }
 
-    public void ShowScores()
+    public IEnumerator StartNewRoundAfterTimeout(float _timeout)
     {
-        Debug.Log("Red team score : " + redTeamScore + ", Blue Team Score : " + blueTeamScore);
+        yield return new WaitForSeconds(_timeout);
+        StartNewRound();
+    }
+
+    public void EndGame()
+    {
+        PlayerManager.instance.DestroyAllPlayerControllers();
+        StartLobbySession();
+        ServerSend.EndGame();   
+    }
+
+    public IEnumerator EndGameAfterTimeout(float _timeout)
+    {
+        yield return new WaitForSeconds(_timeout);
+        EndGame();
+    }
+
+    public void ResetPlayer()
+    {
+        foreach(Player _player in PlayerManager.instance.players.Values)
+        {
+            //reset position
+            Vector2 centerPos = (_player.team == Team.RedTeam) ? redTeamBase.position : blueTeamBase.position;
+            _player.controller.transform.position = RandomCircle(centerPos, spawnRadius);
+
+            //reset power
+            _player.controller.power = 100f;
+        }
     }
 
     private Vector2 RandomCircle(Vector2 center, float radius)
