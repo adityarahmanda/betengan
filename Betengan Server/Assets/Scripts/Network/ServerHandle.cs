@@ -41,7 +41,7 @@ public class ServerHandle
         } else {
             if(LobbyManager.instance.roomMasterId == 0)
             {
-                LobbyManager.instance.SetRoomMaster(_fromClient);
+                LobbyManager.instance.ResetRoomMaster();
             } else {
                 ServerSend.SendRoomMaster();   
             }
