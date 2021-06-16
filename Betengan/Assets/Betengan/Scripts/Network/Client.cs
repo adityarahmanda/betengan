@@ -27,6 +27,7 @@ public class Client : MonoBehaviour
         if (instance == null)
         {
             instance = this;
+            DontDestroyOnLoad(this);
         }
         else if (instance != this)
         {
@@ -36,7 +37,10 @@ public class Client : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        Disconnect();
+        if(myId != 0)
+        {
+            Disconnect();
+        }
     }
 
     public void ConnectToServer(string _ip, int _port)

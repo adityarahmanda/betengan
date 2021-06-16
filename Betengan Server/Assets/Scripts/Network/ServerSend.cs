@@ -152,7 +152,7 @@ public class ServerSend
         {
             _packet.Write(LobbyManager.instance.roomMasterId);
 
-            SendTCPDataToAll(_packet);
+            SendTCPDataToAllPlayers(_packet);
         }
     }
 
@@ -163,7 +163,7 @@ public class ServerSend
             _packet.Write(_playerId);
             _packet.Write((int)_team);
 
-            SendTCPDataToAll(_packet);
+            SendTCPDataToAllPlayers(_packet);
         }
     }
 
@@ -174,7 +174,7 @@ public class ServerSend
             _packet.Write(_maxScore);
             _packet.Write(_roundCountdownTime);
             
-            SendTCPDataToAll(_packet);
+            SendTCPDataToAllPlayers(_packet);
         }
     }
 
@@ -199,7 +199,7 @@ public class ServerSend
         {   
             _packet.Write(_currentRound);
 
-            SendTCPDataToAll(_packet);
+            SendTCPDataToAllPlayers(_packet);
         }
     }
 
@@ -210,7 +210,7 @@ public class ServerSend
             _packet.Write(_playerId);
             _packet.Write(_position);
 
-            SendTCPDataToAll(_packet);
+            SendTCPDataToAllPlayers(_packet);
         }
     }
 
@@ -221,7 +221,7 @@ public class ServerSend
             _packet.Write(_playerId);
             _packet.Write(scaleX);
 
-            SendTCPDataToAll(_packet);
+            SendTCPDataToAllPlayers(_packet);
         }
     }
 
@@ -233,7 +233,7 @@ public class ServerSend
             _packet.Write(_name);
             _packet.Write(_value);
 
-            SendTCPDataToAll(_packet);
+            SendTCPDataToAllPlayers(_packet);
         }
     }
 
@@ -244,7 +244,7 @@ public class ServerSend
             _packet.Write(_playerId);
             _packet.Write(_power);
 
-            SendTCPDataToAll(_packet);
+            SendTCPDataToAllPlayers(_packet);
         }
     }
 
@@ -255,7 +255,7 @@ public class ServerSend
             _packet.Write((int)_teamChest);
             _packet.Write(_openDuration);
 
-            SendTCPDataToAll(_packet);
+            SendTCPDataToAllPlayers(_packet);
         }
     }
 
@@ -266,7 +266,7 @@ public class ServerSend
             _packet.Write((int)_team);
             _packet.Write(_score);
 
-            SendTCPDataToAll(_packet);
+            SendTCPDataToAllPlayers(_packet);
         }
     }
 
@@ -276,7 +276,7 @@ public class ServerSend
         {
             _packet.Write((int)_winnerTeam);
 
-            SendTCPDataToAll(_packet);
+            SendTCPDataToAllPlayers(_packet);
         }
     }
 
@@ -286,7 +286,7 @@ public class ServerSend
         {
             _packet.Write((int)_winnerTeam);
 
-            SendTCPDataToAll(_packet);
+            SendTCPDataToAllPlayers(_packet);
         }
     }
 
@@ -294,7 +294,7 @@ public class ServerSend
     {
         using (Packet _packet = new Packet((int)ServerPackets.endGame))
         {
-            SendTCPDataToAll(_packet);
+            SendTCPDataToAllPlayers(_packet);
         }
     }
 

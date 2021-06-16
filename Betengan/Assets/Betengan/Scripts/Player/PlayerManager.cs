@@ -46,7 +46,7 @@ public class PlayerManager : MonoBehaviour
         return players.ContainsKey(_playerId); 
     }
     
-    public int GetTotalPlayer()
+    public int GetTotalPlayers()
     {
         return players.Count;
     }

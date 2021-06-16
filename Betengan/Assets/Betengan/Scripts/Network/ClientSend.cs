@@ -49,10 +49,12 @@ public class ClientSend : MonoBehaviour
         }
     }
 
-    public static void LobbySceneLoaded()
+    public static void LobbySceneLoaded(bool _sendIntoLobbyRequest)
     {
         using (Packet _packet = new Packet((int)ClientPackets.lobbySceneLoaded))
         {
+            _packet.Write(_sendIntoLobbyRequest);
+
             SendTCPData(_packet);
         }
     }

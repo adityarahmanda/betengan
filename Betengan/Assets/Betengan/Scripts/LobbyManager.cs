@@ -8,6 +8,7 @@ public class LobbyManager : MonoBehaviour
 {
     public static LobbyManager instance;
     public int maxTeamPlayers = 4;
+    public int roomMasterId = 0;
     public string roomMasterLabel = "(RM)";
 
     [Header("UI References")]
@@ -44,7 +45,17 @@ public class LobbyManager : MonoBehaviour
 
         startGameButton.onClick.AddListener(() => ClientSend.RequestStartGame());
 
-        ClientSend.LobbySceneLoaded();
+        if(PlayerManager.instance.GetTotalPlayers() == 0)
+        {
+            ClientSend.LobbySceneLoaded(true);
+        } else {
+            foreach(Player _player in PlayerManager.instance.players.Values)
+            {
+                InstantiatePlayerUsername(_player.id, _player.username, _player.team);
+            }
+            
+            ClientSend.LobbySceneLoaded(false);
+        }
     }
 
     public void InstantiatePlayerUsername(int _playerId, string _username, Team _team)
@@ -54,6 +65,7 @@ public class LobbyManager : MonoBehaviour
         playerUsernameTexts.Add(_playerId, playerUsernameText);
         
         CheckSelectionButton();
+        CheckStartGameButton();
     }
 
     public void RemovePlayerUsername(int _playerId)
@@ -68,6 +80,7 @@ public class LobbyManager : MonoBehaviour
         playerUsernameTexts[_playerId].transform.SetParent(GetPlayerTeamList(_team), false);
         
         CheckSelectionButton();
+        CheckStartGameButton();
     }
 
     public void CheckSelectionButton()
@@ -91,6 +104,18 @@ public class LobbyManager : MonoBehaviour
                 } else {
                     SetSelectButton(Team.RedTeam, true, "Select");
                 }
+            }
+        }
+    }
+
+    public void CheckStartGameButton()
+    {
+        if(Client.instance.myId == roomMasterId)
+        {
+            if(blueTeamPlayersList.childCount == 0 || redTeamPlayersList.childCount == 0 ) {
+                startGameButton.interactable = false;
+            } else {
+                startGameButton.interactable = true;
             }
         }
     }
@@ -120,12 +145,15 @@ public class LobbyManager : MonoBehaviour
 
     public void SetRoomMaster(int _roomMasterId)
     {
-        playerUsernameTexts[_roomMasterId].SetLabelText(roomMasterLabel);
+        roomMasterId = _roomMasterId;
+        playerUsernameTexts[roomMasterId].SetLabelText(roomMasterLabel);
 
-        if(Client.instance.myId == _roomMasterId)
+        if(Client.instance.myId == roomMasterId)
         {
             startGameStatusText.gameObject.SetActive(false);
             startGameButton.gameObject.SetActive(true);
         }
+
+        CheckStartGameButton();
     }
 }

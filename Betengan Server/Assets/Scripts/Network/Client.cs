@@ -213,6 +213,11 @@ public class Client
             {
                 LobbyManager.instance.ResetRoomMaster();
             }
+
+            if(GameManager.instance.isGameSession)
+            {
+                GameManager.instance.PlayerDisconnectionHandler();
+            }
         });
 
         tcp.Disconnect();

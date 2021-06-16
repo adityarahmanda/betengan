@@ -33,7 +33,19 @@ public class ServerHandle
 
     public static void LobbySceneLoaded(int _fromClient, Packet _packet)
     {
-        PlayerManager.instance.SendIntoLobby(_fromClient);
+        bool _requestSendToLobby = _packet.ReadBool();
+
+        if(_requestSendToLobby)
+        {  
+            PlayerManager.instance.SendIntoLobby(_fromClient);
+        } else {
+            if(LobbyManager.instance.roomMasterId == 0)
+            {
+                LobbyManager.instance.SetRoomMaster(_fromClient);
+            } else {
+                ServerSend.SendRoomMaster();   
+            }
+        }
     }
 
     public static void SelectTeam(int _fromClient, Packet _packet)
@@ -58,6 +70,9 @@ public class ServerHandle
     {
         Vector2 inputs = _packet.ReadVector2(); 
 
-        PlayerManager.instance.players[_fromClient].controller.MovementInput(inputs);
+        if(PlayerManager.instance.players[_fromClient].controller != null)
+        {
+            PlayerManager.instance.players[_fromClient].controller.MovementInput(inputs);
+        }
     }
 }

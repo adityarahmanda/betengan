@@ -59,6 +59,8 @@ public class GameManager : MonoBehaviour
     {
         isLobbySession = true;
         isGameSession = false;
+
+        LobbyManager.instance.roomMasterId = 0;
     }
 
     public void StartGameSession()
@@ -178,7 +180,23 @@ public class GameManager : MonoBehaviour
 
             //reset power
             _player.controller.power = 100f;
+            ServerSend.PlayerPower(_player.id, _player.controller.power);
         }
+    }
+
+    public void PlayerDisconnectionHandler()
+    {
+        if(PlayerManager.instance.CountTeamMembers(Team.RedTeam) == 0)
+        {
+            Debug.Log("Blue team wins the game");
+            ServerSend.SetGameWinner(Team.BlueTeam);
+        } else if(PlayerManager.instance.CountTeamMembers(Team.BlueTeam) == 0)
+        {
+            Debug.Log("Red team wins the game");
+            ServerSend.SetGameWinner(Team.RedTeam);
+        }
+        
+        StartCoroutine(EndGameAfterTimeout(winPauseTime));
     }
 
     private Vector2 RandomCircle(Vector2 center, float radius)

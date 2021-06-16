@@ -9,6 +9,7 @@ public class GameSceneManager : MonoBehaviour
     public static GameSceneManager instance;
 
     public int currentRound;
+    private bool gameEnded;
     public CameraController cameraController;
 
     [Header("Prison Gates")]
@@ -104,6 +105,7 @@ public class GameSceneManager : MonoBehaviour
     public void SetGameWinner(Team _winnerTeam)
     {
         GameManager.instance.paused = true;
+        gameEnded = true;
 
         if(_winnerTeam == Team.RedTeam)
         {
@@ -143,16 +145,28 @@ public class GameSceneManager : MonoBehaviour
         roundText.gameObject.SetActive(true);
         countdownText.gameObject.SetActive(true);
 
-        while(countdownTime > 0)
+        float oneSecondTimer = 1f;
+        while(countdownTime > 0 && !gameEnded)
         {
-            yield return new WaitForSeconds(1f);
-            countdownTime--;
-            countdownText.text = "Start after " + countdownTime + " second(s)";
+            if(oneSecondTimer > 0)
+            {
+                oneSecondTimer -= Time.deltaTime;
+            } else {
+                countdownTime--;
+                countdownText.text = "Start after " + countdownTime + " second(s)";
+                
+                oneSecondTimer = 1f;
+            }
+
+            yield return null;
         }
         
         roundText.gameObject.SetActive(false);
         countdownText.gameObject.SetActive(false);
         
-        GameManager.instance.paused = false;
+        if(!gameEnded)
+        {
+            GameManager.instance.paused = false;   
+        }
     }
 }
